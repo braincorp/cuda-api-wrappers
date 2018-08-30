@@ -195,6 +195,7 @@ install(
 	TARGETS cuda-api-wrappers
 	ARCHIVE # For CMake, a static library is an ARCHIVE, a dynamic library is a RUNTIME
 	DESTINATION lib
+	LIBRARY DESTINATION lib
 	INCLUDES DESTINATION include
 	CONFIGURATIONS Release RelWithDebugInfo
 )
