@@ -63,7 +63,7 @@ find_package(CUDA 7.0 REQUIRED)
 include(HandleCUDAComputeCapability)
 
 # There is no CUDA equivalent of CMAKE_CXX_STANDARD* macros... so we're stuck with the following line:
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --std=c++11)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --std=c++11 -fPIC)
 
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -Xcompiler -Wall)
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
