@@ -53,8 +53,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 #SET(CMAKE_BUILD_TYPE distribution)
 
-include_directories( "src/" )
-
 # -------------
 # CUDA
 # -------------
@@ -142,6 +140,7 @@ cuda_add_library(
 	src/cuda/api/device_function.hpp
 	src/cuda/api/miscellany.hpp
 )
+target_include_directories(cuda-api-wrappers PUBLIC "src/")
 
 # -----------------------
 # Examples / Tests
