@@ -65,47 +65,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include_directories( ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} )
 include(HandleCUDAComputeCapability)
 
-<<<<<<< HEAD
-# There is no CUDA equivalent of CMAKE_CXX_STANDARD* macros... so we're stuck with the following line:
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --std=c++11 -fPIC)
-
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -Xcompiler -Wall)
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(CUDA_NVCC_FLAGS_RELEASE ${CUDA_NVCC_FLAGS_RELEASE} -O3 -DNDEBUG)
-elseif (CMAKE_BUILD_TYPE STREQUAL "MinSizeRel;")
-    set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG} -O3 -DNDEBUG)
-elseif (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG} -g --keep --generate-line-info --source-in-ptx -O3 -DNDEBUG)
-elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CUDA_NVCC_FLAGS_DEBUG ${CUDA_NVCC_FLAGS_DEBUG} -g --keep --generate-line-info --source-in-ptx)
-endif ()
-
-set(CUDA_SEPARABLE_COMPILATION ON)
-set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-
-# This should really have been automatic...
-get_filename_component(CUDA_LIBRARY_DIR ${CUDA_CUDART_LIBRARY} DIRECTORY)
-set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} "-L${CUDA_LIBRARY_DIR}" )
-
-find_library(CUDA_NVTX_LIBRARY
-  NAMES nvToolsExt nvTools nvtoolsext nvtools nvtx NVTX
-  PATHS ${CUDA_TOOLKIT_ROOT_DIR}
-  PATH_SUFFIXES "lib64" "common/lib64" "common/lib" "lib"
-  DOC "Location of the CUDA Toolkit Extension (NVTX) library"
-  )
-mark_as_advanced(CUDA_NVTX_LIBRARY)
-set(CUDA_LIBRARIES ${CUDA_LIBRARIES} ${CUDA_NVTX_LIBRARY} ${CUDA_cudadevrt_LIBRARY})
-
-# The FindCUDA script forces the use of the libcublas library when perform device linkage;
-# but on some systems and in certain situations, its inclusion on the command line 
-# triggers various kinds of errors; so - we ensure it is empty and unused
-set(CUDA_cublas_device_LIBRARY "" CACHE FILEPATH "Path of the CUBLAS library - unused dummy value" FORCE)
-=======
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -Wall" )
 set(CMAKE_CUDA_STANDARD 11)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_EXTENSIONS ON)
->>>>>>> 234272b9f96743ca6f7d02610ad57b54d1c4ca0c
 
 set(CUDA_SEPARABLE_COMPILATION ON) # Does this work with native CUDA support?
 set(CUDA_PROPAGATE_HOST_FLAGS OFF) # Does this work with native CUDA support?
@@ -186,14 +149,9 @@ add_dependencies(examples examples_by_runtime_api_module modified_cuda_samples)
 
 install(
 	TARGETS cuda-api-wrappers
-<<<<<<< HEAD
-	ARCHIVE # For CMake, a static library is an ARCHIVE, a dynamic library is a RUNTIME
-	DESTINATION lib
-=======
 	EXPORT cuda-api-wrappers
 	RUNTIME DESTINATION bin
 	ARCHIVE DESTINATION lib
->>>>>>> 234272b9f96743ca6f7d02610ad57b54d1c4ca0c
 	LIBRARY DESTINATION lib
 	INCLUDES DESTINATION include
 	CONFIGURATIONS Release RelWithDebugInfo
