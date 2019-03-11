@@ -9,7 +9,7 @@
 #ifndef CUDA_API_WRAPPERS_ERROR_HPP_
 #define CUDA_API_WRAPPERS_ERROR_HPP_
 
-#include <cuda/api/types.h>
+#include <cuda/api/types.hpp>
 
 #include <cuda_runtime_api.h>
 #include <type_traits>
@@ -109,15 +109,15 @@ enum named_t : std::underlying_type<status_t>::type {
 	api_failure_base                = cudaErrorApiFailureBase
 };
 
-inline bool operator==(const status_t& lhs, const named_t& rhs) { return lhs == (status_t) rhs;}
-inline bool operator!=(const status_t& lhs, const named_t& rhs) { return lhs != (status_t) rhs;}
-inline bool operator==(const named_t& lhs, const status_t& rhs) { return (status_t) lhs == rhs;}
-inline bool operator!=(const named_t& lhs, const status_t& rhs) { return (status_t) lhs != rhs;}
+constexpr inline bool operator==(const status_t& lhs, const named_t& rhs) { return lhs == (status_t) rhs;}
+constexpr inline bool operator!=(const status_t& lhs, const named_t& rhs) { return lhs != (status_t) rhs;}
+constexpr inline bool operator==(const named_t& lhs, const status_t& rhs) { return (status_t) lhs == rhs;}
+constexpr inline bool operator!=(const named_t& lhs, const status_t& rhs) { return (status_t) lhs != rhs;}
 
 } // namespace status
 
-inline bool is_success(status_t status)  { return status == (status_t) status::success; }
-inline bool is_failure(status_t status)  { return status != (status_t) status::success; }
+constexpr inline bool is_success(status_t status)  { return status == (status_t) status::success; }
+constexpr inline bool is_failure(status_t status)  { return status != (status_t) status::success; }
 
 /**
  * Obtain a brief textual explanation for a specified kind of CUDA Runtime API status
@@ -291,4 +291,4 @@ inline void ensure_none(bool clear_any_error = do_clear_errors) noexcept(false)
 
 } // namespace cuda
 
-#endif /* CUDA_API_WRAPPERS_ERROR_HPP_ */
+#endif // CUDA_API_WRAPPERS_ERROR_HPP_

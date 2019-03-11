@@ -9,9 +9,9 @@
 #ifndef CUDA_API_WRAPPERS_DEVICE_PROPERTIES_HPP_
 #define CUDA_API_WRAPPERS_DEVICE_PROPERTIES_HPP_
 
-#include <cuda/api/types.h>
-#include <cuda/api/constants.h>
-#include <cuda/api/pci_id.h>
+#include <cuda/api/types.hpp>
+#include <cuda/api/constants.hpp>
+#include <cuda/api/pci_id.hpp>
 
 #include <cuda_runtime_api.h>
 
@@ -192,4 +192,4 @@ struct properties_t : public cudaDeviceProp {
 } // namespace device
 } // namespace cuda
 
-#endif /* CUDA_API_WRAPPERS_DEVICE_PROPERTIES_HPP_ */
+#endif // CUDA_API_WRAPPERS_DEVICE_PROPERTIES_HPP_

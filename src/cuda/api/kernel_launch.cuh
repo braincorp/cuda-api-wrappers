@@ -42,8 +42,8 @@
 #ifndef CUDA_API_WRAPPERS_KERNEL_LAUNCH_CUH_
 #define CUDA_API_WRAPPERS_KERNEL_LAUNCH_CUH_
 
-#include <cuda/api/types.h>
-#include <cuda/api/constants.h>
+#include <cuda/api/types.hpp>
+#include <cuda/api/constants.hpp>
 #include <cuda/api/device_function.hpp>
 
 #if (__CUDACC_VER_MAJOR__ >= 9)
@@ -57,7 +57,7 @@ namespace cuda {
 
 enum : shared_memory_size_t { no_shared_memory = 0 };
 constexpr grid_dimensions_t single_block() { return 1; }
-constexpr grid_block_dimensions_t single_thread_per_block() { return 1; };
+constexpr grid_block_dimensions_t single_thread_per_block() { return 1; }
 
 namespace detail {
 
@@ -65,7 +65,7 @@ template<typename Fun>
 struct is_function_ptr: std::integral_constant<bool,
     std::is_pointer<Fun>::value and std::is_function<typename std::remove_pointer<Fun>::type>::value> { };
 
-inline void collect_argument_addresses(void** collected_addresses) { }
+inline void collect_argument_addresses(void**) { }
 
 template <typename Arg, typename... Args>
 inline void collect_argument_addresses(void** collected_addresses, Arg&& arg, Args&&... args)
@@ -139,7 +139,13 @@ inline void enqueue_launch(
 		// a bit of useless work here. We could have done exactly the same thing
 		// for the non-cooperative case, mind you.
 
-		void* argument_ptrs[sizeof...(KernelParameters)];
+		// The following hack is due to C++ not supporting arrays of length 0 -
+		// but such an array being necessary for collect_argument_addresses with
+		// multiple parameters. Other workarounds are possible, but would be
+		// more cumbersome, except perhaps with C++17 or later.
+		constexpr auto non_zero_num_params =
+			sizeof...(KernelParameters) == 0 ? 1 : sizeof...(KernelParameters);
+		void* argument_ptrs[non_zero_num_params];
 		// fill the argument array with our parameters. Yes, the use
 		// of the two terms is confusing here and depends on how you
 		// look at things.
@@ -239,4 +245,4 @@ inline void launch(
 
 } // namespace cuda
 
-#endif /* CUDA_KERNEL_LAUNCH_H_ */
+#endif // CUDA_KERNEL_LAUNCH_CUH_

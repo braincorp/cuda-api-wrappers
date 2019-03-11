@@ -10,7 +10,7 @@
  * covered by a different program.
  *
  */
-#include "cuda/api/pci_id.hpp"
+#include "cuda/api/pci_id_impl.hpp"
 #include "cuda/api/device_count.hpp"
 #include "cuda/api/device.hpp"
 #include "cuda/api/error.hpp"
@@ -49,6 +49,16 @@ int main(int argc, char **argv)
 
 	std::cout << "Using CUDA device " << device.name() << " (having device ID " << device.id() << ")\n";
 
+	if (device.id() != device_id) {
+		die_("The device's reported ID and the ID for which we created the device differ: "
+			+ std::to_string(device.id()) + " !=" +  std::to_string(device_id));
+	}
+
+	if (device.id() != device.memory().device_id()) {
+		die_("The device's reported ID and the device's memory object's reported device ID differ: "
+			+ std::to_string(device.id()) + " !=" +  std::to_string(device.memory().device_id()));
+	}
+
 	// Attributes and properties
 	// ---------------------------
 
@@ -68,6 +78,19 @@ int main(int argc, char **argv)
 
 	auto re_obtained_device = cuda::device::get(pci_id_str);
 	assert(re_obtained_device == device);
+
+	// Memory - total and available
+	// -----------------------------------
+
+	auto device_global_mem = device.memory();
+	auto total_memory = device_global_mem.amount_total();
+	auto free_memory = device_global_mem.amount_total();
+
+	std::cout 
+		<< "Device " << std::to_string(device.id()) << " reports it has:\n"
+		<< free_memory << " Bytes free out of " << total_memory << " Bytes total global memory.\n";
+
+	assert(free_memory < total_memory);
 
 
 	// Specific attributes and properties with their own API calls:

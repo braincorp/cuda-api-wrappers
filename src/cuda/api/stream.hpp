@@ -8,7 +8,7 @@
 #ifndef CUDA_API_WRAPPERS_STREAM_HPP_
 #define CUDA_API_WRAPPERS_STREAM_HPP_
 
-#include <cuda/api/types.h>
+#include <cuda/api/types.hpp>
 #include <cuda/api/error.hpp>
 #include <cuda/api/memory.hpp>
 #include <cuda/api/kernel_launch.cuh>
@@ -585,4 +585,4 @@ using queue_id_t = stream::id_t;
 } // namespace cuda
 
 
-#endif /* CUDA_API_WRAPPERS_STREAM_HPP_ */
+#endif // CUDA_API_WRAPPERS_STREAM_HPP_

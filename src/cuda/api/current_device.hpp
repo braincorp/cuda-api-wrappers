@@ -20,8 +20,8 @@
 #ifndef CUDA_API_WRAPPERS_CURRENT_DEVICE_HPP_
 #define CUDA_API_WRAPPERS_CURRENT_DEVICE_HPP_
 
-#include <cuda/api/types.h>
-#include <cuda/api/constants.h>
+#include <cuda/api/types.hpp>
+#include <cuda/api/constants.hpp>
 #include <cuda/api/error.hpp>
 
 #include <cuda_runtime_api.h>
@@ -95,7 +95,7 @@ private:
 template <>
 class scoped_override_t<detail::assume_device_is_current> {
 public:
-	scoped_override_t(device::id_t  device) { }
+	scoped_override_t(device::id_t) { }
 	~scoped_override_t() { }
 };
 
@@ -114,4 +114,4 @@ public:
 } // namespace device
 } // namespace cuda
 
-#endif /* CUDA_API_WRAPPERS_CURRENT_DEVICE_HPP_ */
+#endif // CUDA_API_WRAPPERS_CURRENT_DEVICE_HPP_
