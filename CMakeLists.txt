@@ -32,14 +32,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     # This is the top-level project.
-	PROJECT(cuda-api-wrappers)
-
-#	# No versioning for now
-#
-#	set(PROJECT_MAJOR_VERSION 0)
-#	set(PROJECT_MINOR_VERSION 1)
-#	set(PROJECT_PATCH_VERSION 0)
-#	set(PROJECT_VERSION ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}.${PROJECT_PATCH_VERSION})
+    PROJECT(cuda-api-wrappers VERSION 0.1)
 endif()
 
 
