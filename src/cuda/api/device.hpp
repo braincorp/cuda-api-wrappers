@@ -9,11 +9,11 @@
 #ifndef CUDA_API_WRAPPERS_DEVICE_HPP_
 #define CUDA_API_WRAPPERS_DEVICE_HPP_
 
-#include <cuda/api/types.h>
+#include <cuda/api/types.hpp>
 #include <cuda/api/device_properties.hpp>
 #include <cuda/api/memory.hpp>
 #include <cuda/api/current_device.hpp>
-#include <cuda/api/pci_id.h>
+#include <cuda/api/pci_id.hpp>
 #include <cuda/api/unique_ptr.hpp>
 
 #include <cuda_runtime_api.h>
@@ -234,22 +234,19 @@ public:	// types
 	 * namespace (which C++ does not support); whenever you see a function
 	 * `my_dev.memory::foo()`, think of it as a `my_dev::memory::foo()`.
 	 */
-	class memory_t {
+	class global_memory_t {
 	protected:
-		const id_holder_type& device_id;
+		const id_holder_type& device_id_;
 
 		using deleter = memory::device::detail::deleter;
 		using allocator = memory::device::detail::allocator;
 
-		std::string device_id_as_str() const
-		{
-			return device_t::device_id_as_str(device_id);
-		}
-
 	public:
 		///@cond
-		memory_t(const device_t::id_holder_type& id) : device_id(id) { }
+		global_memory_t(const device_t::id_holder_type& id) : device_id_(id) { }
 		///@endcond
+
+		cuda::device::id_t device_id() const { return device_id_; }
 
 		/**
 		 * Allocate a region of memory on the device
@@ -259,7 +256,7 @@ public:	// types
 		 */
 		void* allocate(size_t size_in_bytes)
 		{
-			scoped_setter_t set_device_for_this_scope(device_id);
+			scoped_setter_t set_device_for_this_scope(device_id_);
 			return memory::device::detail::allocate(size_in_bytes);
 		}
 
@@ -291,32 +288,8 @@ public:	// types
 			initial_visibility_t initial_visibility =
 				initial_visibility_t::to_supporters_of_concurrent_managed_access)
 		{
-			scoped_setter_t set_device_for_this_scope(device_id);
+			scoped_setter_t set_device_for_this_scope(device_id_);
 			return cuda::memory::managed::detail::allocate(size_in_bytes, initial_visibility);
-		}
-
-		using region_pair = ::cuda::memory::mapped::region_pair;
-
-		/**
-		 * @brief Allocate a pair of mapped regions, in device-global memory and
-		 * in host memory.
-		 *
-		 * @note see @ref memory::mapped::region_pair for an explanation of how
-		 * region pairs work.
-		 *
-		 * @param size_in_bytes of the region to allocate
-		 * @param options to be passed to the CUDA memory allocation API
-		 * @return a non-null pair of allocated regions
-		 */
-		region_pair allocate_region_pair(
-			size_t                           size_in_bytes,
-			region_pair::allocation_options  options = {
-				region_pair::isnt_portable_across_cuda_contexts,
-				region_pair::without_cpu_write_combining
-			})
-		{
-			scoped_setter_t set_device_for_this_scope(device_id);
-			return memory::mapped::detail::allocate(size_in_bytes, options);
 		}
 
 		/**
@@ -324,12 +297,12 @@ public:	// types
 		 */
 		size_t amount_total() const
 		{
-			scoped_setter_t set_device_for_this_scope(device_id);
+			scoped_setter_t set_device_for_this_scope(device_id_);
 			size_t total_mem_in_bytes;
 			auto status = cudaMemGetInfo(nullptr, &total_mem_in_bytes);
 			throw_if_error(status,
 				std::string("Failed determining amount of total memory "
-					"for CUDA device ") + device_id_as_str());
+					"for CUDA device ") + device_id_as_str(device_id_));
 			return total_mem_in_bytes;
 		}
 
@@ -341,14 +314,14 @@ public:	// types
 		 */
 		size_t amount_free() const
 		{
-			scoped_setter_t set_device_for_this_scope(device_id);
+			scoped_setter_t set_device_for_this_scope(device_id_);
 			size_t free_mem_in_bytes;
 			auto status = cudaMemGetInfo(&free_mem_in_bytes, nullptr);
 			throw_if_error(status, "Failed determining amount of "
-				"free memory for " + device_id_as_str());
+				"free memory for CUDA device " + device_id_as_str(device_id_));
 			return free_mem_in_bytes;
 		}
-	}; // class memory_t
+	}; // class global_memory_t
 
 	/**
 	 * @brief Determine whether this device can access the global memory
@@ -434,6 +407,11 @@ protected:
 	}
 
 public:
+	/**
+	 * @brief Obtains a proxy for the device's global memory
+	 */
+	global_memory_t memory() { return global_memory_t(id_); };
+
 	/**
 	 * Obtains the (mostly) non-numeric properties for this device.
 	 */
@@ -891,14 +869,6 @@ protected:
 	 * later.
 	 */
 	const id_holder_type id_;
-
-public:
-	// faux data members (used as surrogates for internal namespaces)
-	///@cond
-	memory_t memory { id_ };
-	// don't worry, this will not actually use the id_ value
-	// without making sure it's been correctly determined
-	///@endcond
 };
 
 template<bool LHSAssumedCurrent, bool RHSAssumedCurrent>
@@ -1048,4 +1018,4 @@ inline unique_ptr<T> make_unique(device_t<AssumedCurrent>& device)
 
 } // namespace cuda
 
-#endif /* CUDA_API_WRAPPERS_DEVICE_HPP_ */
+#endif // CUDA_API_WRAPPERS_DEVICE_HPP_

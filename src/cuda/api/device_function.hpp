@@ -13,7 +13,7 @@
 #ifndef CUDA_API_WRAPPERS_DEVICE_FUNCTION_HPP_
 #define CUDA_API_WRAPPERS_DEVICE_FUNCTION_HPP_
 
-#include <cuda/api/types.h>
+#include <cuda/api/types.hpp>
 #include <cuda/api/device_properties.hpp>
 #include <cuda/api/error.hpp>
 #include <cuda/api/current_device.hpp>
@@ -21,6 +21,9 @@
 #include <cuda_runtime_api.h>
 
 namespace cuda {
+
+template<bool AssumedCurrent>
+class device_t;
 
 namespace device_function {
 
@@ -63,7 +66,10 @@ inline shared_memory_size_t maximum_dynamic_shared_memory_per_block(
 } // namespace device_function
 
 /**
- * A non-owning wrapper class for CUDA `__device__` functions
+ * A non-owning wrapper class for CUDA `__global__` functions
+ *
+ * @note despite the name, a `device_function_t` is not associated with a specific
+ * device - it cant just be _executed_ on a device.
  */
 class device_function_t {
 public: // getters
@@ -208,25 +214,14 @@ inline shared_memory_size_t maximum_dynamic_shared_memory_per_block(
  * @url http://docs.nvidia.com/cuda/maxwell-tuning-guide/index.html
  */
 inline grid_dimension_t maximum_active_blocks_per_multiprocessor(
-	device::id_t              device_id,
+	device_t<detail::do_not_assume_device_is_current>
+                              device,
 	const device_function_t&  device_function,
 	grid_block_dimension_t    num_threads_per_block,
 	shared_memory_size_t      dynamic_shared_memory_per_block,
-	bool                      disable_caching_override = false)
-{
-	device::current::scoped_override_t<> set_device_for_this_context(device_id);
-	int result;
-	unsigned int flags = disable_caching_override ?
-		cudaOccupancyDisableCachingOverride : cudaOccupancyDefault;
-	auto status = cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(
-		&result, device_function.ptr(), num_threads_per_block,
-		dynamic_shared_memory_per_block, flags);
-	throw_if_error(status, "Failed calculating the maximum occupancy "
-		"of device function blocks per multiprocessor");
-	return result;
-}
+	bool                      disable_caching_override = false);
 
 } // namespace device_function
 } // namespace cuda
 
-#endif /* CUDA_API_WRAPPERS_DEVICE_FUNCTION_HPP_ */
+#endif // CUDA_API_WRAPPERS_DEVICE_FUNCTION_HPP_
